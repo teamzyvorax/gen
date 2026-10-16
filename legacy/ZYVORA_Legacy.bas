@@ -3,15 +3,13 @@ Option Explicit
 
 ' ZYVORA Tools - Excel 2013 Legacy Add-in
 ' Import this module into a blank workbook and save it as ZYVORA_Tools.xlam.
-' The installer script can automate this on a PC with Excel installed.
 
-' ---------------- FORMULAS MASTER ----------------
 Public Sub ZYVORA_InsertVLookup()
     ActiveCell.Formula = "=VLOOKUP(A1,B:C,2,FALSE)"
 End Sub
 
 Public Sub ZYVORA_InsertIfError()
-    ActiveCell.Formula = "=IFERROR(A1,"")"
+    ActiveCell.Formula = "=IFERROR(A1,"""")"
 End Sub
 
 Public Sub ZYVORA_InsertLeft()
@@ -30,7 +28,6 @@ Public Sub ZYVORA_InsertSubstitute()
     ActiveCell.Formula = "=SUBSTITUTE(A1,""."","""")"
 End Sub
 
-' ---------------- CODE GENERATOR ----------------
 Public Sub ZYVORA_CodeFormula()
     Dim p As String, a As String, b As String, n As Long
     p = InputBox("Prefix:", "ZYVORA Code Generator", "LG")
@@ -41,7 +38,6 @@ Public Sub ZYVORA_CodeFormula()
     ActiveCell.Formula = "=LEFT(""" & Replace(p, """", """"") & """," & Len(p) & ")&" & a & "&LEFT(SUBSTITUTE(" & b & ",""."","""")," & n & ")"
 End Sub
 
-' ---------------- TEXT TOOLS ----------------
 Public Sub ZYVORA_TrimSelected(): ZYVORA_TextFormula "TRIM": End Sub
 Public Sub ZYVORA_UpperSelected(): ZYVORA_TextFormula "UPPER": End Sub
 Public Sub ZYVORA_LowerSelected(): ZYVORA_TextFormula "LOWER": End Sub
@@ -59,7 +55,6 @@ Private Sub ZYVORA_TextFormula(ByVal fn As String)
     Next c
 End Sub
 
-' ---------------- DATA TOOLS ----------------
 Public Sub ZYVORA_AutoFit()
     If TypeName(Selection) = "Range" Then Selection.EntireColumn.AutoFit
 End Sub
@@ -90,7 +85,7 @@ Public Sub ZYVORA_FreezeTopRow()
     ActiveWindow.FreezePanes = True
 End Sub
 
-' ---------------- RAPNET TOOLS ----------------
+' RAPNET TOOLS
 Public Sub ZYVORA_RapNetHeader()
     Dim r As Range
     Set r = ActiveCell
@@ -112,8 +107,7 @@ Public Sub ZYVORA_RapNetCleanSelected()
 End Sub
 
 Public Sub ZYVORA_RapNetExportReady()
-    Dim ws As Worksheet, out As Worksheet, src As Range
-    Set ws = ActiveSheet
+    Dim out As Worksheet, src As Range
     Set src = Selection
     Set out = Worksheets.Add(After:=Worksheets(Worksheets.Count))
     out.Name = "RapNet_Export_" & Format(Now, "hhmmss")
@@ -122,16 +116,14 @@ Public Sub ZYVORA_RapNetExportReady()
     MsgBox "RapNet-ready copy created: " & out.Name, vbInformation, "ZYVORA RapNet"
 End Sub
 
-' ---------------- BARCODE TOOLS ----------------
-Public Sub ZYVORA_BarcodeCode128Text()
+' BARCODE TOOLS
+Public Sub ZYVORA_BarcodeCode39Text()
     Dim c As Range
     If TypeName(Selection) <> "Range" Then Exit Sub
     For Each c In Selection.Cells
-        If Len(CStr(c.Value)) > 0 Then
-            c.Offset(0, 1).Value = "*" & CStr(c.Value) & "*"
-        End If
+        If Len(CStr(c.Value)) > 0 Then c.Offset(0, 1).Value = "*" & CStr(c.Value) & "*"
     Next c
-    MsgBox "Barcode text prepared. For a scannable barcode, install a Code 39/Code 128 barcode font and apply it to the generated cells.", vbInformation, "ZYVORA Barcode"
+    MsgBox "Barcode text prepared. Apply a Code 39 barcode font to the generated cells for scanning.", vbInformation, "ZYVORA Barcode"
 End Sub
 
 Public Sub ZYVORA_BarcodeSheet()
@@ -140,33 +132,31 @@ Public Sub ZYVORA_BarcodeSheet()
     ws.Name = "Barcode_" & Format(Now, "hhmmss")
     ws.Range("A1").Value = "ZYVORA Barcode Sheet"
     ws.Range("A1").Font.Bold = True
-    ws.Range("A3").Value = "Enter SKU / barcode values in column A"
-    ws.Range("B3").Value = "Code 39 text"
+    ws.Range("A3").Value = "SKU / barcode value"
+    ws.Range("B3").Value = "Code 39"
     ws.Columns("A:B").ColumnWidth = 24
-    MsgBox "Barcode sheet created. Put values in column A, then run Barcode Code 39 Text.", vbInformation, "ZYVORA Barcode"
+    MsgBox "Barcode sheet created. Enter values in column A and run Barcode Code 39 Text.", vbInformation, "ZYVORA Barcode"
 End Sub
 
-' ---------------- AI TOOLS ----------------
+' AI TOOLS
 Public Sub ZYVORA_AIPrompt()
     Dim q As String
-    q = InputBox("What do you want the AI prompt to do?", "ZYVORA AI Tools", "Clean and standardize this Excel data")
+    q = InputBox("What should the AI prompt do?", "ZYVORA AI Tools", "Clean and standardize this Excel data")
     If Len(q) = 0 Then Exit Sub
     ActiveCell.Value = "Prompt: " & q & vbCrLf & "Use the selected Excel range as context. Return a concise, Excel-ready result."
 End Sub
 
-' ---------------- CUSTOM FORMULA BUILDER ----------------
+' CUSTOM FORMULA BUILDER
 Public Sub ZYVORA_CustomFormulaBuilder()
-    Dim fn As String, ref As String, f As String
+    Dim fn As String, ref As String
     fn = InputBox("Function name (example LEFT, TRIM, UPPER):", "ZYVORA Formula Builder", "TRIM")
     ref = InputBox("Cell reference:", "ZYVORA Formula Builder", "A1")
     If Len(fn) = 0 Or Len(ref) = 0 Then Exit Sub
-    f = "=" & fn & "(" & ref & ")"
-    ActiveCell.Formula = f
+    ActiveCell.Formula = "=" & fn & "(" & ref & ")"
 End Sub
 
-' ---------------- SETTINGS & HELP ----------------
 Public Sub ZYVORA_Help()
-    MsgBox "ZYVORA Tools - Excel 2013 Legacy\n\nUse the ZYVORA buttons/macros for formulas, text cleanup, data tools, RapNet formatting, barcode preparation, AI prompt helpers and custom formulas.", vbInformation, "ZYVORA Tools"
+    MsgBox "ZYVORA Tools - Excel 2013 Legacy" & vbCrLf & vbCrLf & "Formulas, Text, Code Generator, Data, AI prompt helper, Formula Builder, RapNet and Barcode tools are included.", vbInformation, "ZYVORA Tools"
 End Sub
 
 Public Sub ZYVORA_ShowVersion()
