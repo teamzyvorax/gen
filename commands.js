@@ -1,0 +1,1 @@
+/* global Office */ Office.onReady(()=>{});
